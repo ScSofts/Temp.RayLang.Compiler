@@ -1,0 +1,4 @@
+fn main(args:string) -> void{
+    return;//return no value at all
+    return 0;
+}
