@@ -30,10 +30,11 @@ Space:                  ' ' -> skip;
 Digit:                  ([1-9][0-9]*|[0]);
 
 start
-: (declaration| implement)*?;
+: (declaration | implement)*?;
 
 declaration
-:    functionDeclaration;
+:    functionDeclaration
+|    variableDeclaration;
 
 implement
 :    functionImplement;
@@ -69,5 +70,5 @@ functionDeclaration
 functionImplement
 : function block;
 
-varDeclaration
-:Var Identifier ':' Types;
+variableDeclaration
+:Var Identifier ':' Types ';';
