@@ -30,8 +30,7 @@ Space:                  ' ' -> skip;
 Digit:                  ([1-9][0-9]*|[0]);
 
 start
-: declaration
-| implement;
+: (declaration| implement)*?;
 
 declaration
 :    functionDeclaration;
@@ -55,7 +54,7 @@ args
 
 
 block
-:'{' expressions '}';
+:'{' expressions? '}';
 
 expressions
 : expression ';' (expression ';')*;

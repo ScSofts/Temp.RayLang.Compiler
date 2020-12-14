@@ -1,4 +1,8 @@
-fn main(args:string) -> void{
+function fib(now:int32){
+
+}
+
+fn main(args:string,code:int32) -> void{
     return;//return no value at all
     return 0;
 }
