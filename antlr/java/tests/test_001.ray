@@ -2,7 +2,7 @@ function fib(now:int32){
 
 }
 var i:int8 ;
-fn main(args:string,code:int32) -> void{
-    return;//return no value at all
-    return 0;
+fn main(args:const string,code:const int32) -> void{
+    //return;//return no value at all
+    return ((0+2)*2+2/2);
 }

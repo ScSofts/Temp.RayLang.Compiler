@@ -1,6 +1,12 @@
 grammar Ray;
 
-Equal:                  '=';
+options {
+}
+
+Pow:                    '^';
+Not:                    '!';
+Or:                     '|';
+SetEqual:               '=';
 Dot:                    '.';
 Colon:                  ':';
 MultiLineComment:       '/*'.*?'*/'  -> skip;
@@ -14,16 +20,25 @@ ListRight:              ']';
 At:                     '@';
 Semicolon:              ';';
 Comma:                  ',';
+Less:                   '<';
+More:                   '>';
 SingleArrow:            '->';
 Arrow:                  '=>';
+Equal:                  '==';
+NotEqual:               '!=';
+LessEqual:              '<=';
+MoreEqual:              '>=';
 Return:                 'return';
 Function:               ('function' | 'fn');
 fragment Int:           ('int8'|'int16'|'int32'|'int64');
 fragment Floats:        ('float'|'double');
 fragment String:        'string';
 fragment Void:          'void';
+fragment ConstInt:      ('const int8'|'const int16'|'const int32'|'const int64');
+fragment ConstFloats:   ('const float'|'const double');
+fragment ConstString:   'const string';
 Var:                    'var';
-Types:                  (Int|Floats|String|Void);
+Types:                  (Int|Floats|String|Void|ConstInt|ConstFloats|ConstString);
 Identifier:             [$A-Za-z_][A-Za-z0-9_]*;
 Blanks:                 [\r\n\t] -> skip;
 Space:                  ' ' -> skip;
@@ -40,12 +55,19 @@ implement
 :    functionImplement;
 
 statement
-:   ;//TODO: finish this statement!
+:   setValueStatement;//TODO: finish this statement!
 
 expression
-:   Return expression
+:   expression ('*'|'/') expression
+|   expression ('+'|'-') expression
+|   expression ('^'|'|') expression
+|   expression ('>'|'<'|'=='|'!='|'>='| '<=' ) expression
+|   '!' expression
 |   Digit
-|   statement;
+|   statement
+|   Var
+|   Identifier
+|   '(' expression ')';
 
 arg
 : Identifier ':' Types;   
@@ -56,6 +78,9 @@ args
 
 block
 :'{' expressions? '}';
+
+functionBlock
+:'{' (expressions|returnExpression)? '}';
 
 expressions
 : expression ';' (expression ';')*;
@@ -68,7 +93,13 @@ functionDeclaration
 : function ';';
 
 functionImplement
-: function block;
+: function functionBlock;
 
 variableDeclaration
 :Var Identifier ':' Types ';';
+
+returnExpression
+:   Return expression ';';
+
+setValueStatement
+:   Identifier '=' expression;

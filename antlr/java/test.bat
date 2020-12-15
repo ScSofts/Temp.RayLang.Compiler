@@ -1,1 +1,1 @@
-antlr4 Ray.g4 -long-messages  -o ./  && javac -cp .;./antlr4.jar *.java && grun Ray start tests\test_001.ray -gui -diagnostics %*
+antlr4 Ray.g4 -long-messages  -o ./  && javac -cp .;./antlr4.jar *.java && grun Ray start tests\test_001.ray -gui -SLL -diagnostics %*
