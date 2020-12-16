@@ -35,12 +35,13 @@ Export: 'put';
 Alias: 'as';
 
 Function: ('function' | 'fn');
-fragment Int: ('int8' | 'int16' | 'int32' | 'int64');
+fragment Int: ('int8' | 'int16' | ('int32'|'int') | 'int64');
 fragment Floats: ('float' | 'double');
 fragment String: 'string';
 fragment Void: 'void';
 fragment ConstInt: (
-		'const int8'
+        'const int'
+        |'const int8'
 		| 'const int16'
 		| 'const int32'
 		| 'const int64'
