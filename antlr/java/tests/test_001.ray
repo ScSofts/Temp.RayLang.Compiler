@@ -1,8 +1,11 @@
+get console;
+
 function fib(now:int32){
 
 }
 var i:int8 ;
-fn main(args:const string,code:const int32) -> void{
+fn main(args:const string,code:const int32) -> int32{
     //return;//return no value at all
-    return ((0+2)*2+2/2);
+    console.out(args);
+    return (1+1);
 }
