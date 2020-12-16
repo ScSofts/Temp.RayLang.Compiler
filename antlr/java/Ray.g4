@@ -29,6 +29,10 @@ NotEqual:               '!=';
 LessEqual:              '<=';
 MoreEqual:              '>=';
 Return:                 'return';
+
+Import:                 'get';
+Export:                 'put';
+
 Function:               ('function' | 'fn');
 fragment Int:           ('int8'|'int16'|'int32'|'int64');
 fragment Floats:        ('float'|'double');
@@ -45,7 +49,7 @@ Space:                  ' ' -> skip;
 Digit:                  ([1-9][0-9]*|[0]);
 
 start
-: (declaration | implement)*?;
+: (declaration | implement|importStatement)*?;
 
 declaration
 :    functionDeclaration
@@ -103,3 +107,9 @@ returnExpression
 
 setValueStatement
 :   Identifier '=' expression;
+
+importStatement
+:   Import Identifier ';';
+
+exportStatement
+:   Export Identifier '{' (declaration)*? '}' ';';
