@@ -90,7 +90,7 @@ args: arg (Comma arg)*;
 
 block: '{' expressions*? '}';
 
-functionBlock: '{' ( returnExpression | expressions)*? '}';
+functionBlock: '{' ( returnExpression | variableInitializationAndDeclaration | expressions)*? '}';
 
 expressions: expression ';' (expression ';')*;
 
@@ -103,6 +103,12 @@ functionDeclaration: function ';';
 functionImplement: function functionBlock;
 
 variableDeclaration: Var Identifier ':' Types ';';
+
+//var i = 122;//i is auto int32
+variableInitializationAndDeclaration:
+    Var Identifier ':' Types '=' expression ';'
+    |Var Identifier '=' expression ';'
+;
 
 returnExpression: Return ';' | Return expression ';';
 
