@@ -1,9 +1,14 @@
 get console;
 
+put test_001 {
+    function fib(now:int32);
+    function main(args:const string,code:const int32) -> int32;
+    var i:int8;
+};
+
 function fib(now:int32){
 
 }
-var i:int8 ;
 fn main(args:const string,code:const int32) -> int32{
     //return;//return no value at all
     console.out(args);

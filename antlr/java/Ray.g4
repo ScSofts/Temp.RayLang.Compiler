@@ -63,7 +63,7 @@ Blanks: [\r\n\t] -> skip;
 Space: ' ' -> skip;
 Digit: ([1-9][0-9]* | [0]);
 
-start: (declaration | implement | importStatement)*?;
+start: (declaration | implement | importStatement | exportStatement)*?;
 
 declaration: functionDeclaration | variableDeclaration;
 
