@@ -35,19 +35,20 @@ Export: 'put';
 Alias: 'as';
 
 Function: ('function' | 'fn');
-fragment Int: ('int8' | 'int16' | ('int32'|'int') | 'int64');
+fragment Int: ('int8' | 'int16' | ('int32' | 'int') | 'int64');
 fragment Floats: ('float' | 'double');
 fragment String: 'string';
 fragment Void: 'void';
 fragment ConstInt: (
-        'const int'
-        |'const int8'
+		'const int'
+		| 'const int8'
 		| 'const int16'
 		| 'const int32'
 		| 'const int64'
 	);
 fragment ConstFloats: ('const float' | 'const double');
 fragment ConstString: 'const string';
+fragment Identifier_f: [$A-Za-z_][A-Za-z0-9_]*;
 Var: 'var';
 Types: (
 		Int
@@ -59,19 +60,25 @@ Types: (
 		| ConstString
 	);
 KeyWords: (Types | Var | Return | Export | Import | Alias);
-Identifier: [$A-Za-z_][A-Za-z0-9_]*;
+Identifier: Identifier_f;
 Blanks: [\r\n\t] -> skip;
 Space: ' ' -> skip;
 Digit: ([1-9][0-9]* | [0]);
+//MemberIdentifier: Identifier ('.' Identifier)*?;
 
-start: (declaration | implement | importStatement | exportStatement)*?;
+start: (
+		declaration
+		| implement
+		| importStatement
+		| exportStatement
+	)*?;
 
 declaration: functionDeclaration | variableDeclaration;
 
 implement: functionImplement;
 
-statement: setValueStatement; //TODO: finish this statement!
-
+statement: setValueStatement ';'; //TODO: finish this statement!
+memberIdentifier:Identifier ('.' Identifier)*?;
 expression:
 	functionCallExpression
 	| expression ('*' | '/') expression
@@ -80,9 +87,7 @@ expression:
 	| expression ('>' | '<' | '==' | '!=' | '>=' | '<=') expression
 	| '!' expression
 	| Digit
-	| statement
-	| Var
-	| Identifier
+	| memberIdentifier
 	| '(' expression ')';
 
 arg: Identifier ':' Types;
@@ -91,9 +96,15 @@ args: arg (Comma arg)*;
 
 block: '{' expressions*? '}';
 
-functionBlock: '{' ( returnExpression | variableInitializationAndDeclaration | expressions)*? '}';
+functionBlock:
+	'{' (
+		returnExpression
+		| variableInitializationAndDeclaration
+        | statement
+		| expressions
+	)*? '}';
 
-expressions: expression ';' (expression ';')*;
+expressions: expression ';' (expression ';')*?;
 
 function:
 	Function Identifier '(' args? ')' '->' Types
@@ -107,24 +118,25 @@ variableDeclaration: Var Identifier ':' Types ';';
 
 //var i = 122;//i is auto int32
 variableInitializationAndDeclaration:
-    Var Identifier ':' Types '=' expression ';'
-    |Var Identifier '=' expression ';'
-;
+	Var Identifier ':' Types '=' expression ';'
+	| Var Identifier '=' expression ';';
 
 returnExpression: Return ';' | Return expression ';';
 
-setValueStatement: Identifier '=' expression;
+setValueStatement: memberIdentifier '=' expression;
 
+bathImport: Identifier (',' Identifier)*? | Identifier;
 importStatement:
 	(
-		Import Identifier Alias Identifier ';'
+		Import Identifier '{' bathImport? '}' ';'
+		| Import Identifier Alias Identifier ';'
 		| Import Identifier ';'
 	);
 
 exportStatement: Export Identifier '{' (declaration)*? '}' ';';
 
-functionCallExpression: (Identifier '.')? Identifier '(' call_args? ')';
+functionCallExpression: memberIdentifier '(' call_args? ')';
 
 call_args:
-	Identifier
-	| expression (',' (Identifier | expression)?);
+	memberIdentifier
+	| expression (',' (memberIdentifier | expression)?);
