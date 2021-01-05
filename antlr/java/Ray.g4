@@ -30,7 +30,7 @@ LessEqual: '<=';
 MoreEqual: '>=';
 Return: 'return';
 SingleQuotation: '\'';
-MultiQuotation:	'"';
+MultiQuotation: '"';
 Import: 'get';
 Export: 'put';
 Alias: 'as';
@@ -55,7 +55,7 @@ If: 'if';
 For: 'for';
 Switch: 'switch';
 Else: 'else';
-Types: (
+fragment Type: (
 		Int
 		| Floats
 		| String
@@ -64,6 +64,10 @@ Types: (
 		| ConstFloats
 		| ConstString
 	);
+Types:
+	Type '[' IntConstant? ']'
+	|Type
+;
 KeyWords: (
 		Types
 		| Var
@@ -79,16 +83,24 @@ KeyWords: (
 Identifier: Identifier_f;
 Blanks: [\r\n\t] -> skip;
 Space: ' ' -> skip;
-fragment Digit				: '0' | [1-9][0-9_]*;
-fragment IntConstant		: ('-')? Digit;
-fragment FloatConstant		: ('-')? Digit'.'Digit;
-fragment SingleLineString  	: '\'' (ESC | ~["\\\n\r])* '\'';
-fragment MultiString  		: '"' ([\n] | [\r] | ESC | ~["\\] )* '"';
-fragment ESC     			: '\\' (["\\/bfnrt] | ANSI) ;
-fragment ANSI				: [1-9] ( ( [0-9] )? [0-9] )?;
-Constants: (IntConstant | FloatConstant | SingleLineString  | MultiString);
+fragment Digit: '0' | [1-9][0-9_]*;
+fragment IntConstant: ('-')? Digit;
+fragment FloatConstant: ('-')? Digit '.' Digit;
+fragment SingleLineString: '\'' (ESC | ~["\\\n\r])* '\'';
+fragment MultiString: '"' ([\n] | [\r] | ESC | ~["\\])* '"';
+fragment ESC: '\\' (["\\/bfnrt] | ANSI);
+fragment ANSI: [1-9] ( ( [0-9])? [0-9])?;
+Constants: (
+		IntConstant
+		| FloatConstant
+		| SingleLineString
+		| MultiString
+		| List
+	);
+List: '[' (Constants (',' Constants)*? )? ']';
+
 //MemberIdentifier: Identifier ('.' Identifier)*?;
-memberIdentifier: Identifier ('.' Identifier)*?;
+memberIdentifier: Identifier ('.' Identifier)*? ('[' (memberIdentifier|Constants) ']')*?;
 
 start: (
 		declaration
@@ -172,10 +184,7 @@ ifStatement:
 		Else If '(' expression ')' functionBlock
 	)*? (Else functionBlock)?;
 
-switchBlock:
-	(Constants (',' Constants )*? )? '->' functionBlock
-	;
+switchBlock: (Constants (',' Constants)*?)? '->' functionBlock;
 
 switchStatement:
-	Switch '(' memberIdentifier ')' '{' (switchBlock)*?  '}'
-	;
+	Switch '(' memberIdentifier ')' '{' (switchBlock)*? '}';

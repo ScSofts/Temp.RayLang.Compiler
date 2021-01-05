@@ -45,6 +45,7 @@ Identifier=44
 Blanks=45
 Space=46
 Constants=47
+List=48
 '*'=1
 '/'=2
 '+'=3
