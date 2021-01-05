@@ -1,17 +1,26 @@
 get console {out};
 
 put test_001 {
-    function fib(now:int32);
-    function main(args:const string,code:const int32) -> int32;
     var i:int8;
 };
 
 function fib(now:int32){
 
 }
+
 fn main(args:const string,code:const int32) -> int32{
-    //return;//return no value at all
     var i = 0;
+    if(i == 2){
+        i = 4;
+    }
+    switch(i){
+        0,1,4->{
+            out(i);
+        }
+        ->{
+            out("Error!");
+        }
+    }
     out(args);
     return (1+1);
 }

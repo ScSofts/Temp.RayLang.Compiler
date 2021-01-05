@@ -29,7 +29,8 @@ NotEqual: '!=';
 LessEqual: '<=';
 MoreEqual: '>=';
 Return: 'return';
-
+SingleQuotation: '\'';
+MultiQuotation:	'"';
 Import: 'get';
 Export: 'put';
 Alias: 'as';
@@ -50,6 +51,10 @@ fragment ConstFloats: ('const float' | 'const double');
 fragment ConstString: 'const string';
 fragment Identifier_f: [$A-Za-z_][A-Za-z0-9_]*;
 Var: 'var';
+If: 'if';
+For: 'for';
+Switch: 'switch';
+Else: 'else';
 Types: (
 		Int
 		| Floats
@@ -59,12 +64,31 @@ Types: (
 		| ConstFloats
 		| ConstString
 	);
-KeyWords: (Types | Var | Return | Export | Import | Alias);
+KeyWords: (
+		Types
+		| Var
+		| Return
+		| Export
+		| Import
+		| Alias
+		| If
+		| For
+		| Switch
+		| Else
+	);
 Identifier: Identifier_f;
 Blanks: [\r\n\t] -> skip;
 Space: ' ' -> skip;
-Digit: ([1-9][0-9]* | [0]);
+fragment Digit				: '0' | [1-9][0-9_]*;
+fragment IntConstant		: ('-')? Digit;
+fragment FloatConstant		: ('-')? Digit'.'Digit;
+fragment SingleLineString  	: '\'' (ESC | ~["\\\n\r])* '\'';
+fragment MultiString  		: '"' ([\n] | [\r] | ESC | ~["\\] )* '"';
+fragment ESC     			: '\\' (["\\/bfnrt] | ANSI) ;
+fragment ANSI				: [1-9] ( ( [0-9] )? [0-9] )?;
+Constants: (IntConstant | FloatConstant | SingleLineString  | MultiString);
 //MemberIdentifier: Identifier ('.' Identifier)*?;
+memberIdentifier: Identifier ('.' Identifier)*?;
 
 start: (
 		declaration
@@ -77,8 +101,10 @@ declaration: functionDeclaration | variableDeclaration;
 
 implement: functionImplement;
 
-statement: setValueStatement ';'; //TODO: finish this statement!
-memberIdentifier:Identifier ('.' Identifier)*?;
+statement:
+	setValueStatement ';'
+	| ifStatement
+	| switchStatement; //TODO: finish this statement!
 expression:
 	functionCallExpression
 	| expression ('*' | '/') expression
@@ -86,7 +112,7 @@ expression:
 	| expression ('^' | '|') expression
 	| expression ('>' | '<' | '==' | '!=' | '>=' | '<=') expression
 	| '!' expression
-	| Digit
+	| Constants
 	| memberIdentifier
 	| '(' expression ')';
 
@@ -94,13 +120,13 @@ arg: Identifier ':' Types;
 
 args: arg (Comma arg)*;
 
-block: '{' expressions*? '}';
+declarationsBlock: '{' (declaration)*? '}';
 
 functionBlock:
 	'{' (
 		returnExpression
 		| variableInitializationAndDeclaration
-        | statement
+		| statement
 		| expressions
 	)*? '}';
 
@@ -133,10 +159,23 @@ importStatement:
 		| Import Identifier ';'
 	);
 
-exportStatement: Export Identifier '{' (declaration)*? '}' ';';
+exportStatement: Export Identifier declarationsBlock ';';
 
 functionCallExpression: memberIdentifier '(' call_args? ')';
 
 call_args:
 	memberIdentifier
-	| expression (',' (memberIdentifier | expression)?);
+	| expression (',' (memberIdentifier | expression))*;
+
+ifStatement:
+	If '(' expression ')' functionBlock (
+		Else If '(' expression ')' functionBlock
+	)*? (Else functionBlock)?;
+
+switchBlock:
+	(Constants (',' Constants )*? )? '->' functionBlock
+	;
+
+switchStatement:
+	Switch '(' memberIdentifier ')' '{' (switchBlock)*?  '}'
+	;
