@@ -8,7 +8,7 @@ function fib(now:int32){
 
 }
 
-fn main(args:const string,code:const int32) -> int32{
+fn main(args:const string[],code:const int32) -> int32{
     var i:int[] = [0,1,2,3];
     if(i == 2){
         i = 4;
