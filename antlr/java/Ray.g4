@@ -3,188 +3,226 @@ grammar Ray;
 options {
 }
 
-Pow: '^';
-Not: '!';
-Or: '|';
-SetEqual: '=';
-Dot: '.';
-Colon: ':';
+
+//Tokens
+
+fragment Space: ' ';
+Blanks: ([\n\r\b\t]|Space) -> skip;
+
+And: 		'&';
+Xor: 		'^';
+Not: 		'!';
+Or: 		'|';
+Reverse: 	'~';
+SetEqual: 	'=';
+Dot: 		'.';
+Colon: 		':';
 MultiLineComment: '/*' .*? '*/' -> skip;
 SingleLineComment: '//' .*? [\n] -> skip;
-BlockLeft: '{';
-BlockRight: '}';
-PairLeft: '(';
-PairRight: ')';
-ListLeft: '[';
-ListRight: ']';
-At: '@';
-Semicolon: ';';
-Comma: ',';
-Less: '<';
-More: '>';
-SingleArrow: '->';
-Arrow: '=>';
-Equal: '==';
-NotEqual: '!=';
-LessEqual: '<=';
-MoreEqual: '>=';
-Return: 'return';
+BlockLeft: 		 '{';
+BlockRight: 	 '}';
+PairLeft: 		 '(';
+PairRight: 		 ')';
+ListLeft: 		 '[';
+ListRight: 		 ']';
+At: 			 '@';
+Semicolon: 		 ';';
+Comma: 			 ',';
+Less: 			 '<';
+More: 			 '>';
+SingleArrow: 	 '->';
+Arrow: 			 '=>';
+Equal: 			 '==';
+NotEqual: 		 '!=';
+LessEqual: 		 '<=';
+MoreEqual: 		 '>=';
 SingleQuotation: '\'';
-MultiQuotation: '"';
-Import: 'get';
-Export: 'put';
-Alias: 'as';
+MultiQuotation:  '"';
+Import: 		 'get';
+Export: 		 'put';
+Alias: 			 'as';
+Function: 		 ('function' | 'fn');
+Var: 			 'var';
+Const: 			 'const';
+If: 			 'if';
+Else: 			 'else';
+Match: 			 'match';
+For:			 'for';
+While:           'While';
+Return:    		 'return';
+Identifier: 	 [A-Za-z_$][A-Za-z_0-9$]*;
 
-Function: ('function' | 'fn');
-fragment Int: ('int8' | 'int16' | ('int32' | 'int') | 'int64');
-fragment Floats: ('float' | 'double');
-fragment String: 'string';
-fragment Void: 'void';
-fragment ConstInt: (
-		'const int'
-		| 'const int8'
-		| 'const int16'
-		| 'const int32'
-		| 'const int64'
-	);
-fragment ConstFloats: ('const float' | 'const double');
-fragment ConstString: 'const string';
-fragment Identifier_f: [$A-Za-z_][A-Za-z0-9_]*;
-Var: 'var';
-If: 'if';
-For: 'for';
-Switch: 'switch';
-Else: 'else';
-fragment Type: (
-		Int
-		| Floats
-		| String
-		| Void
-		| ConstInt
-		| ConstFloats
-		| ConstString
-	);
-Types:
-	Type '[' IntConstant? ']'
-	|Type
-;
-KeyWords: (
-		Types
-		| Var
-		| Return
-		| Export
-		| Import
-		| Alias
-		| If
-		| For
-		| Switch
-		| Else
-	);
-Identifier: Identifier_f;
-Blanks: [\r\n\t] -> skip;
-Space: ' ' -> skip;
-fragment Digit: '0' | [1-9][0-9_]*;
-fragment IntConstant: ('-')? Digit;
-fragment FloatConstant: ('-')? Digit '.' Digit;
-fragment SingleLineString: '\'' (ESC | ~["\\\n\r])* '\'';
-fragment MultiString: '"' ([\n] | [\r] | ESC | ~["\\])* '"';
-fragment ESC: '\\' (["\\/bfnrt] | ANSI);
-fragment ANSI: [1-9] ( ( [0-9])? [0-9])?;
-Constants: (
-		IntConstant
-		| FloatConstant
-		| SingleLineString
-		| MultiString
-		| List
-	);
-List: '[' (Constants (',' Constants)*? )? ']';
+Plus:       '+';
+Minus:      '-';
+Multiply:   '*';
+Divide:     '/';
+SlefPlus:   '++';
+SelfMinus:  '--';
+Pow:		'**';
 
-//MemberIdentifier: Identifier ('.' Identifier)*?;
-memberIdentifier: Identifier ('.' Identifier)*? ('[' (memberIdentifier|Constants) ']')*?;
+fragment OctalDigit:   [0-7];
+fragment BinaryConstant:	'0' [bB] [0-1]+;
+fragment OctalConstant:   '0' OctalDigit*;
+fragment HexadecimalDigit: [0-9a-fA-F];
+fragment HexQuad:   HexadecimalDigit HexadecimalDigit HexadecimalDigit HexadecimalDigit;
+fragment UniversalCharacterName
+    :   '\\u' HexQuad
+    |   '\\U' HexQuad HexQuad
+    ;
 
-start: (
-		declaration
-		| implement
-		| importStatement
-		| exportStatement
-	)*?;
+fragment EscapeSequence
+    :   SpecialEscapeSequence
+    |   OctalEscapeSequence
+    |   HexadecimalEscapeSequence
+    |   UniversalCharacterName
+    ;
+fragment SpecialEscapeSequence
+    :   '\\' ['"?abfnrtv\\]
+    ;
+fragment OctalEscapeSequence
+    :   '\\' OctalDigit OctalDigit? OctalDigit?
+    ;
+fragment HexadecimalEscapeSequence
+    :   '\\x' HexadecimalDigit+
+    ;
 
-declaration: functionDeclaration | variableDeclaration;
+fragment IntTypes: ( 'int8' | 'int16' | 'int32' | 'int64' );
+fragment FloatTypes: ( 'float' | 'double');
+fragment UIntTypes: 'u'IntTypes;
+fragment UFloatTypes: 'u'FloatTypes;
+fragment StringTypes: ('string');
 
-implement: functionImplement;
+fragment DecimalConstant :   NonzeroDigit ('_')? (Digit|'_')*;
+fragment HexadecimalConstant
+    :   HexadecimalPrefix HexadecimalDigit+
+    ;
 
-statement:
-	setValueStatement ';'
-	| ifStatement
-	| switchStatement; //TODO: finish this statement!
-expression:
-	functionCallExpression
-	| expression ('*' | '/') expression
-	| expression ('+' | '-') expression
-	| expression ('^' | '|') expression
-	| expression ('>' | '<' | '==' | '!=' | '>=' | '<=') expression
-	| '!' expression
-	| Constants
-	| memberIdentifier
-	| '(' expression ')';
+fragment HexadecimalPrefix:   '0' [xX];
+fragment Digit:[0-9];
+fragment NonzeroDigit:   [1-9];
 
-arg: Identifier ':' Types;
+fragment IntegerSuffix
+    :   UnsignedSuffix LongSuffix?
+    |   UnsignedSuffix LongLongSuffix
+    |   LongSuffix UnsignedSuffix?
+    |   LongLongSuffix UnsignedSuffix?
+    ;
+fragment UnsignedSuffix
+    :   [uU]
+    ;
 
-args: arg (Comma arg)*;
+fragment LongSuffix
+    :   [lL]
+    ;
 
-declarationsBlock: '{' (declaration)*? '}';
+fragment LongLongSuffix
+    :   'll' | 'LL'
+    ;
+
+Types: (IntTypes|FloatTypes|UIntTypes|StringTypes) ( (' ')? '['']')?;
+Integer: (BinaryConstant | OctalConstant | DecimalConstant) IntegerSuffix?;
+Float: Digit '.' Digit+;
+fragment DChar
+    :   ~["\\]
+    |   EscapeSequence
+    |   '\\\n'   // Added line
+    |   '\\\r\n' // Added line
+    ;
+fragment SChar
+    :   ~['\\]
+    |   EscapeSequence
+    |   '\\\n'   // Added line
+    |   '\\\r\n' // Added line
+    ;
+
+StringLiteral
+    :   ('"' (DChar+)? '"' | '\''(SChar+)? '\'') ;
+
+
+
+//grammar
+
+start: (declaration | statement | expression)*? EOF;
+
+declaration: variableDeclaration | functionDeclaration | getDeclaration | putDeclaration;
+
+variableDeclaration: (Var|Const) Identifier ':' (Types|Identifier) (SetEqual expression)? ';';
+functionDeclaration: ('fn'|'function') Identifier '(' ( arg (',' arg)*)? ')' (':' (Types|Identifier) )? ';';
+getDeclaration: At'get' Identifier 'as' ( getBlock | Identifier ) ';' ;
+getLine: Identifier ('as' Identifier)?;
+getBlock:'{' (getLine)? (',' getLine)* '}';
+putDeclaration: At'put' putBlock ';'?;
+
+putBlock: '{' (variableDeclaration | functionDeclaration | statement)* '}';
+
+statement: functionStatement | typeStatement;
+functionStatement: ('fn'|'function') Identifier '(' ( arg (',' arg)*)? ')' (':' (Types|Identifier) )? functionBlock;
+arg: Identifier ':' (Types|Identifier);
+
+typeStatement: 'type' Identifier '='  (Types | Identifier) ';';
+
+ifExpression:
+            ('if' '(' expression ')' '{'
+                functionLine
+            '}')
+            ('else' 'if' '(' expression ')' '{'
+                functionLine
+            '}')*
+            ('else' '{'
+                functionLine
+            '}')?
+            ;
+
+
+
+whileExpression: While'(' ')' functionBlock;
+matchExpression: Match'(' expression ')' '{'
+                    ('case' ((StringLiteral|Integer|Float) (',' (StringLiteral|Integer|Float))*) functionBlock)*
+                    ('else' functionBlock)?
+                 '}';
+forExpression: For'(' variableDeclaration? ';' expression? ';' expression? ')' functionBlock;
+
+
+functionLine:  (
+       declaration
+     | 'return'? expression ';' 
+     | ifExpression 
+     | whileExpression 
+     | matchExpression 
+     | forExpression
+)    ;
 
 functionBlock:
-	'{' (
-		returnExpression
-		| variableInitializationAndDeclaration
-		| statement
-		| expressions
-	)*? '}';
+	'{'
+		 ( 
+			   functionLine
+		 )*?
+	'}';
 
-expressions: expression ';' (expression ';')*?;
+	
 
-function:
-	Function Identifier '(' args? ')' '->' Types
-	| Function Identifier '(' args? ')';
+expression:
+	StringLiteral
+    |Integer
+    |Float
+	| Identifier
+	| <assoc=right>Identifier '=' expression
+	| expression ('>'|'<'|'>='|'<='|'=='|'!=') expression
+	| Identifier '.' functionCall
+	| Identifier '.' Identifier
+	| functionCall
+	| expression ('++'|'--')
+	| ('++'|'--')expression
+	| expression ( '&&' | '||' ) expression
+	| ('!'|'~')  expression
+	| expression ('&'|'|') expression
+	| <assoc=right> expression '^' expression
+	| <assoc=right> expression '**' expression
+	| expression ('*'|'/') expression
+	| expression ('+'|'-') expression
 
-functionDeclaration: function ';';
+	| '(' expression ')'
+	;
 
-functionImplement: function functionBlock;
-
-variableDeclaration: Var Identifier ':' Types ';';
-
-//var i = 122;//i is auto int32
-variableInitializationAndDeclaration:
-	Var Identifier ':' Types '=' expression ';'
-	| Var Identifier '=' expression ';';
-
-returnExpression: Return ';' | Return expression ';';
-
-setValueStatement: memberIdentifier '=' expression;
-
-bathImport: Identifier (',' Identifier)*? | Identifier;
-importStatement:
-	(
-		Import Identifier '{' bathImport? '}' ';'
-		| Import Identifier Alias Identifier ';'
-		| Import Identifier ';'
-	);
-
-exportStatement: Export Identifier declarationsBlock ';';
-
-functionCallExpression: memberIdentifier '(' call_args? ')';
-
-call_args:
-	memberIdentifier
-	| expression (',' (memberIdentifier | expression))*;
-
-ifStatement:
-	If '(' expression ')' functionBlock (
-		Else If '(' expression ')' functionBlock
-	)*? (Else functionBlock)?;
-
-switchBlock: (Constants (',' Constants)*?)? '->' functionBlock;
-
-switchStatement:
-	Switch '(' memberIdentifier ')' '{' (switchBlock)*? '}';
+functionCall:
+	Identifier '(' (expression ( ',' expression)*? )? ')';

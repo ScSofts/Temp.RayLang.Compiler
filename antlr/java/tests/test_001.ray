@@ -1,26 +1,6 @@
-get console {out};
+@get console as Console;
+@get console as { Puts as puts , Gets as gets};
 
-put test_001 {
-    var i:int8;
+@put {
+    type int32_t = int32;
 };
-
-function fib(now:int32){
-
-}
-
-fn main(args:const string[],code:const int32) -> int32{
-    var i:int[] = [0,1,2,3];
-    if(i == 2){
-        i = 4;
-    }
-    switch(i){
-        0,1,4->{
-            out(i);
-        }
-        ->{
-            out("Error!");
-        }
-    }
-    out(args);
-    return (1+1);
-}
