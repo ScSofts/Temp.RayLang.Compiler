@@ -14,7 +14,7 @@ Xor: 		'^';
 Not: 		'!';
 Or: 		'|';
 Reverse: 	'~';
-SetEqual: 	'=';
+SetEqual: 	'='|'+='|'-='|'*='|'/='|'^='|'|='|'&='|'<<='|'=>>';
 Dot: 		'.';
 Colon: 		':';
 MultiLineComment: '/*' .*? '*/' -> skip;
@@ -30,6 +30,8 @@ Semicolon: 		 ';';
 Comma: 			 ',';
 Less: 			 '<';
 More: 			 '>';
+MoveRight:       '>>';
+MoveLeft:        '<<';
 SingleArrow: 	 '->';
 Arrow: 			 '=>';
 Equal: 			 '==';
@@ -56,7 +58,7 @@ Plus:       '+';
 Minus:      '-';
 Multiply:   '*';
 Divide:     '/';
-SlefPlus:   '++';
+SelfPlus:   '++';
 SelfMinus:  '--';
 Pow:		'**';
 
@@ -91,7 +93,7 @@ fragment FloatTypes: ( 'float' | 'double');
 fragment UIntTypes: 'u'IntTypes;
 fragment UFloatTypes: 'u'FloatTypes;
 fragment StringTypes: ('string');
-
+fragment ByteType: 'byte';
 fragment DecimalConstant :   NonzeroDigit ('_')? (Digit|'_')*;
 fragment HexadecimalConstant
     :   HexadecimalPrefix HexadecimalDigit+
@@ -119,7 +121,7 @@ fragment LongLongSuffix
     :   'll' | 'LL'
     ;
 
-Types: (IntTypes|FloatTypes|UIntTypes|StringTypes) ( (' ')? '['']')?;
+Types: (ByteType|IntTypes|FloatTypes|UIntTypes|StringTypes) ('['']')?;
 Integer: (BinaryConstant | OctalConstant | DecimalConstant) IntegerSuffix?;
 Float: Digit '.' Digit+;
 fragment DChar
@@ -144,10 +146,14 @@ StringLiteral
 
 start: (declaration | statement | expression)*? EOF;
 
-declaration: variableDeclaration | functionDeclaration | getDeclaration | putDeclaration;
+declaration: variableDeclaration| nativedVar | functionDeclaration | getDeclaration | putDeclaration;
 
-variableDeclaration: (Var|Const) Identifier ':' (Types|Identifier) (SetEqual expression)? ';';
-functionDeclaration: ('fn'|'function') Identifier '(' ( arg (',' arg)*)? ')' (':' (Types|Identifier) )? ';';
+variableDeclaration: exportStatement?  (Var|Const) Identifier ':' (Types|Identifier) (SetEqual expression)? ';';
+nativedVar: nativedDeclaration (Var|Const) Identifier ':' (Types|Identifier) ';' ;
+
+functionDeclaration: (functionSuffix| nativedDeclaration )? ('fn'|'function') Identifier '(' ( arg (',' arg)*)? ')' (':' (Types|Identifier) )? ';';
+nativedDeclaration:('@' 'native' '(' StringLiteral ',' StringLiteral ')');
+
 getDeclaration: At'get' Identifier 'as' ( getBlock | Identifier ) ';' ;
 getLine: Identifier ('as' Identifier)?;
 getBlock:'{' (getLine)? (',' getLine)* '}';
@@ -156,11 +162,15 @@ putDeclaration: At'put' putBlock ';'?;
 putBlock: '{' (variableDeclaration | functionDeclaration | statement)* '}';
 
 statement: functionStatement | typeStatement;
-functionStatement: ('fn'|'function') Identifier '(' ( arg (',' arg)*)? ')' (':' (Types|Identifier) )? functionBlock;
+functionStatement: functionSuffix? ('fn'|'function') Identifier '(' ( arg (',' arg)*)? ')' (':' (Types|Identifier) )? functionBlock;
 arg: Identifier ':' (Types|Identifier);
 
 typeStatement: 'type' Identifier '='  (Types | Identifier) ';';
 
+
+functionSuffix: exportStatement
+                | ('@' Identifier)+ ;
+exportStatement: ('@' 'export' '(' StringLiteral ')' );
 ifExpression:
             ('if' '(' expression ')' '{'
                 functionLine
@@ -181,15 +191,21 @@ matchExpression: Match'(' expression ')' '{'
                     ('else' functionBlock)?
                  '}';
 forExpression: For'(' variableDeclaration? ';' expression? ';' expression? ')' functionBlock;
-
-
+breakExpression: 'break';
+continueExpression :'continue';
+returnExpression: 'return' expression? ';';
 functionLine:  (
        declaration
-     | 'return'? expression ';' 
+     | expression ';'
      | ifExpression 
      | whileExpression 
      | matchExpression 
      | forExpression
+     | typeStatement
+
+     | breakExpression
+     | continueExpression
+     | returnExpression
 )    ;
 
 functionBlock:
@@ -202,26 +218,29 @@ functionBlock:
 	
 
 expression:
-	StringLiteral
-    |Integer
-    |Float
+	  StringLiteral
+    | Integer
+    | Float
 	| Identifier
-	| <assoc=right>Identifier '=' expression
-	| expression ('>'|'<'|'>='|'<='|'=='|'!=') expression
 	| Identifier '.' functionCall
 	| Identifier '.' Identifier
 	| functionCall
+    | '(' expression ')'
 	| expression ('++'|'--')
 	| ('++'|'--')expression
-	| expression ( '&&' | '||' ) expression
-	| ('!'|'~')  expression
+    | expression ('<<'|'>>') expression
+	| expression ('>'|'<'|'>='|'<='|'=='|'!=') expression
 	| expression ('&'|'|') expression
 	| <assoc=right> expression '^' expression
+
+	| expression ( '&&' | '||' ) expression
+    | expression '?' expression ':' expression
+
 	| <assoc=right> expression '**' expression
 	| expression ('*'|'/') expression
 	| expression ('+'|'-') expression
-
-	| '(' expression ')'
+	| <assoc=right> ('!'|'~')  expression
+	| <assoc=right>Identifier ('='|'+='|'-='|'*='|'/='|'^='|'|='|'&='|'<<='|'=>>') expression
 	;
 
 functionCall:

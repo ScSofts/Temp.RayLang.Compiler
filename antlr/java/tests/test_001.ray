@@ -4,3 +4,14 @@
 @put {
     type int32_t = int32;
 };
+
+fn add( a:int32 , b:int32):int32_t{
+    return a + b;
+}
+
+@native("test.dll","hello_world")
+const str:byte[];
+
+function main(args:string[]):void{
+    Puts(string(str));
+}
