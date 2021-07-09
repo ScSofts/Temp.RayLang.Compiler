@@ -142,6 +142,7 @@ StringLiteral
 
 
 
+
 //grammar
 
 start: (declaration | statement | expression)*? EOF;
@@ -154,7 +155,7 @@ nativedVar: nativedDeclaration (Var|Const) Identifier ':' (Types|Identifier) ';'
 functionDeclaration: (functionSuffix| nativedDeclaration )? ('fn'|'function') Identifier '(' ( arg (',' arg)*)? ')' (':' (Types|Identifier) )? ';';
 nativedDeclaration:('@' 'native' '(' StringLiteral ',' StringLiteral ')');
 
-getDeclaration: At'get' Identifier 'as' ( getBlock | Identifier ) ';' ;
+getDeclaration: At'get' Identifier('.'Identifier)* 'as' ( getBlock | Identifier ) ';' ;
 getLine: Identifier ('as' Identifier)?;
 getBlock:'{' (getLine)? (',' getLine)* '}';
 putDeclaration: At'put' putBlock ';'?;
@@ -221,9 +222,8 @@ expression:
 	  StringLiteral
     | Integer
     | Float
-	| Identifier
-	| Identifier '.' functionCall
-	| Identifier '.' Identifier
+	| Identifier('.'Identifier)* '.' functionCall
+	| Identifier('.'Identifier)*
 	| functionCall
     | '(' expression ')'
 	| expression ('++'|'--')

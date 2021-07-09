@@ -15,10 +15,6 @@
 class  RayBaseVisitor : public RayVisitor {
 public:
 
-  virtual antlrcpp::Any visitMemberIdentifier(RayParser::MemberIdentifierContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
   virtual antlrcpp::Any visitStart(RayParser::StartContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -27,39 +23,11 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitImplement(RayParser::ImplementContext *ctx) override {
+  virtual antlrcpp::Any visitVariableDeclaration(RayParser::VariableDeclarationContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitStatement(RayParser::StatementContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitExpression(RayParser::ExpressionContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitArg(RayParser::ArgContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitArgs(RayParser::ArgsContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitDeclarationsBlock(RayParser::DeclarationsBlockContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitFunctionBlock(RayParser::FunctionBlockContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitExpressions(RayParser::ExpressionsContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitFunction(RayParser::FunctionContext *ctx) override {
+  virtual antlrcpp::Any visitNativedVar(RayParser::NativedVarContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -67,31 +35,47 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitFunctionImplement(RayParser::FunctionImplementContext *ctx) override {
+  virtual antlrcpp::Any visitNativedDeclaration(RayParser::NativedDeclarationContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitVariableDeclaration(RayParser::VariableDeclarationContext *ctx) override {
+  virtual antlrcpp::Any visitGetDeclaration(RayParser::GetDeclarationContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitVariableInitializationAndDeclaration(RayParser::VariableInitializationAndDeclarationContext *ctx) override {
+  virtual antlrcpp::Any visitGetLine(RayParser::GetLineContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitReturnExpression(RayParser::ReturnExpressionContext *ctx) override {
+  virtual antlrcpp::Any visitGetBlock(RayParser::GetBlockContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitSetValueStatement(RayParser::SetValueStatementContext *ctx) override {
+  virtual antlrcpp::Any visitPutDeclaration(RayParser::PutDeclarationContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitBathImport(RayParser::BathImportContext *ctx) override {
+  virtual antlrcpp::Any visitPutBlock(RayParser::PutBlockContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitImportStatement(RayParser::ImportStatementContext *ctx) override {
+  virtual antlrcpp::Any visitStatement(RayParser::StatementContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitFunctionStatement(RayParser::FunctionStatementContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitArg(RayParser::ArgContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitTypeStatement(RayParser::TypeStatementContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitFunctionSuffix(RayParser::FunctionSuffixContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -99,23 +83,47 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitFunctionCallExpression(RayParser::FunctionCallExpressionContext *ctx) override {
+  virtual antlrcpp::Any visitIfExpression(RayParser::IfExpressionContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitCall_args(RayParser::Call_argsContext *ctx) override {
+  virtual antlrcpp::Any visitWhileExpression(RayParser::WhileExpressionContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitIfStatement(RayParser::IfStatementContext *ctx) override {
+  virtual antlrcpp::Any visitMatchExpression(RayParser::MatchExpressionContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitSwitchBlock(RayParser::SwitchBlockContext *ctx) override {
+  virtual antlrcpp::Any visitForExpression(RayParser::ForExpressionContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitSwitchStatement(RayParser::SwitchStatementContext *ctx) override {
+  virtual antlrcpp::Any visitBreakExpression(RayParser::BreakExpressionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitContinueExpression(RayParser::ContinueExpressionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitReturnExpression(RayParser::ReturnExpressionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitFunctionLine(RayParser::FunctionLineContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitFunctionBlock(RayParser::FunctionBlockContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitExpression(RayParser::ExpressionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitFunctionCall(RayParser::FunctionCallContext *ctx) override {
     return visitChildren(ctx);
   }
 

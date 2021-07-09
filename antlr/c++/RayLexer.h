@@ -12,15 +12,20 @@
 class  RayLexer : public antlr4::Lexer {
 public:
   enum {
-    T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, Pow = 5, Not = 6, Or = 7, SetEqual = 8, 
-    Dot = 9, Colon = 10, MultiLineComment = 11, SingleLineComment = 12, 
-    BlockLeft = 13, BlockRight = 14, PairLeft = 15, PairRight = 16, ListLeft = 17, 
-    ListRight = 18, At = 19, Semicolon = 20, Comma = 21, Less = 22, More = 23, 
-    SingleArrow = 24, Arrow = 25, Equal = 26, NotEqual = 27, LessEqual = 28, 
-    MoreEqual = 29, Return = 30, SingleQuotation = 31, MultiQuotation = 32, 
-    Import = 33, Export = 34, Alias = 35, Function = 36, Var = 37, If = 38, 
-    For = 39, Switch = 40, Else = 41, Types = 42, KeyWords = 43, Identifier = 44, 
-    Blanks = 45, Space = 46, Constants = 47, List = 48
+    T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
+    T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14, 
+    T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, T__18 = 19, T__19 = 20, 
+    T__20 = 21, Blanks = 22, And = 23, Xor = 24, Not = 25, Or = 26, Reverse = 27, 
+    SetEqual = 28, Dot = 29, Colon = 30, MultiLineComment = 31, SingleLineComment = 32, 
+    BlockLeft = 33, BlockRight = 34, PairLeft = 35, PairRight = 36, ListLeft = 37, 
+    ListRight = 38, At = 39, Semicolon = 40, Comma = 41, Less = 42, More = 43, 
+    MoveRight = 44, MoveLeft = 45, SingleArrow = 46, Arrow = 47, Equal = 48, 
+    NotEqual = 49, LessEqual = 50, MoreEqual = 51, SingleQuotation = 52, 
+    MultiQuotation = 53, Import = 54, Export = 55, Alias = 56, Function = 57, 
+    Var = 58, Const = 59, If = 60, Else = 61, Match = 62, For = 63, While = 64, 
+    Return = 65, Identifier = 66, Plus = 67, Minus = 68, Multiply = 69, 
+    Divide = 70, SelfPlus = 71, SelfMinus = 72, Pow = 73, Types = 74, Integer = 75, 
+    Float = 76, StringLiteral = 77
   };
 
   explicit RayLexer(antlr4::CharStream *input);
