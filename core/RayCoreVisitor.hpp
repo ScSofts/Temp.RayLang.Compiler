@@ -8,10 +8,11 @@ public:
         size_t character;        
     };
     
-    RayCoreVisitor(std::string moduleName):
+    RayCoreVisitor(std::string moduleName,std::unique_ptr<llvm::Module> module):
         moduleName(moduleName),
         RayVisitor(),
-        forWhileCounts(size_t{})
+        forWhileCounts(size_t{}),
+        module(std::move(module))
     {
     }
 
@@ -100,4 +101,5 @@ protected:
     std::string moduleName;
     size_t forWhileCounts = 0;
     std::vector<error_code> errors;
+    std::unique_ptr<llvm::Module> module;
 };

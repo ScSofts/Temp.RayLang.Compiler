@@ -17,7 +17,13 @@ int main(int argc, const char** argv) {
     for(auto i = args.begin() + 1; i < args.end();i++){
       if((*i)[0] != '-'){
         std::ifstream f(*i,std::ios::binary);
-        compile(f,*i);
+        try{
+          compile(f,*i);
+        }catch(std::range_error &e){
+          std::cerr << "Unrecognized file format \"" << *i << "\" ! " << std::endl;
+        }catch(std::exception &e){
+          std::cerr << "Compiler throwed a exception when handling \"" << *i << "\" : "<< e.what() << std::endl;
+        }
       }
     }
   }
@@ -33,17 +39,27 @@ void compile(std::ifstream & f, std::string name){
   //token sources
   antlr4::ANTLRInputStream ins(f);
   RayLexer lexer(&ins);
-  RayCoreErrorListener errorListener{name};
-  lexer.removeErrorListeners();
-  lexer.addErrorListener(&errorListener);
   antlr4::CommonTokenStream tks(&lexer);
-  
+  RayCoreErrorListener errorListener{name,ins,tks};
+  lexer.removeErrorListeners();
+  lexer.addErrorListener(&errorListener);  
 
   RayParser parser(&tks);
   parser.removeErrorListeners();
   parser.addErrorListener(&errorListener);
   
+  if(errorListener.errorCount > 0){
+    std::fprintf(stderr,
+                  "Compile \"%s\" failed with %lld error(s).",
+                  name.c_str(),
+                  errorListener.errorCount
+                );
+    return;
+  }
+  llvm::LLVMContext context;
+  std::unique_ptr<llvm::Module> module = std::make_unique<llvm::Module>(name , context);
+  module->setSourceFileName(name);
   //visit and generate ir code
-  RayCoreVisitor visitor{name};
+  RayCoreVisitor visitor{name,std::move(module)};
   visitor.visit(parser.start());
 }
