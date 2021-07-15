@@ -14,5 +14,6 @@ const str:byte[];
 
 function main(args:string[]):void{
     Puts(string(str));
-   
+    const x:string[] = ["x","y"];
+    console.log(x[1]);
 }

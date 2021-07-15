@@ -78,11 +78,11 @@ Types=77
 Integer=78
 Float=79
 StringLiteral=80
-'fn'=1
-'function'=2
-'native'=3
-'type'=4
-'='=5
+'='=1
+'fn'=2
+'function'=3
+'native'=4
+'type'=5
 'export'=6
 'case'=7
 'break'=8

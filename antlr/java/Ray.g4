@@ -152,7 +152,7 @@ start: (declaration | statement | expression)*? EOF;
 
 declaration: variableDeclaration| nativedVar | functionDeclaration | getDeclaration | putDeclaration;
 
-variableDeclaration: exportStatement?  (Var|Const) Identifier ':' (Types|Identifier) (SetEqual expression)? ';';
+variableDeclaration: exportStatement?  (Var|Const) Identifier ':' (Types|Identifier) ('=' expression)? ';';
 nativedVar: nativedDeclaration (Var|Const) Identifier ':' (Types|Identifier) ';' ;
 
 functionDeclaration: (functionSuffix| nativedDeclaration )? ('fn'|'function') Identifier '(' ( arg (',' arg)*)? ')' (':' (Types|Identifier) )? ';';
@@ -226,8 +226,8 @@ expression:
     | Integer
     | Float
     | ( True | False | Null )
-	| Identifier('.'Identifier)* '.' functionCall
-	| Identifier('.'Identifier)*
+	| Identifier('['expression']')* ('.'Identifier('['expression']')*)* '.' functionCall
+	| Identifier('['expression']')* ('.'Identifier('['expression']')*)*
 	| functionCall
     | '(' expression ')'
 	| expression ('++'|'--')
@@ -245,6 +245,7 @@ expression:
 	| expression ('+'|'-') expression
 	| <assoc=right> ('!'|'~')  expression
 	| <assoc=right>Identifier ('='|'+='|'-='|'*='|'/='|'^='|'|='|'&='|'<<='|'=>>') expression
+    |'[' (expression (','expression)*)? ']'
 	;
 
 functionCall:

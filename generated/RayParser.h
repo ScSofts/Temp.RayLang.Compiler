@@ -131,7 +131,6 @@ public:
     antlr4::tree::TerminalNode *Const();
     antlr4::tree::TerminalNode *Types();
     ExportStatementContext *exportStatement();
-    antlr4::tree::TerminalNode *SetEqual();
     ExpressionContext *expression();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -632,14 +631,20 @@ public:
     std::vector<antlr4::tree::TerminalNode *> Dot();
     antlr4::tree::TerminalNode* Dot(size_t i);
     FunctionCallContext *functionCall();
-    antlr4::tree::TerminalNode *PairLeft();
+    std::vector<antlr4::tree::TerminalNode *> ListLeft();
+    antlr4::tree::TerminalNode* ListLeft(size_t i);
     std::vector<ExpressionContext *> expression();
     ExpressionContext* expression(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> ListRight();
+    antlr4::tree::TerminalNode* ListRight(size_t i);
+    antlr4::tree::TerminalNode *PairLeft();
     antlr4::tree::TerminalNode *PairRight();
     antlr4::tree::TerminalNode *SelfPlus();
     antlr4::tree::TerminalNode *SelfMinus();
     antlr4::tree::TerminalNode *Not();
     antlr4::tree::TerminalNode *Reverse();
+    std::vector<antlr4::tree::TerminalNode *> Comma();
+    antlr4::tree::TerminalNode* Comma(size_t i);
     antlr4::tree::TerminalNode *MoveLeft();
     antlr4::tree::TerminalNode *MoveRight();
     antlr4::tree::TerminalNode *More();
