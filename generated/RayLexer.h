@@ -23,9 +23,9 @@ public:
     NotEqual = 49, LessEqual = 50, MoreEqual = 51, SingleQuotation = 52, 
     MultiQuotation = 53, Import = 54, Export = 55, Alias = 56, Function = 57, 
     Var = 58, Const = 59, If = 60, Else = 61, Match = 62, For = 63, While = 64, 
-    Return = 65, Identifier = 66, Plus = 67, Minus = 68, Multiply = 69, 
-    Divide = 70, SelfPlus = 71, SelfMinus = 72, Pow = 73, Types = 74, Integer = 75, 
-    Float = 76, StringLiteral = 77
+    Return = 65, True = 66, False = 67, Null = 68, Identifier = 69, Plus = 70, 
+    Minus = 71, Multiply = 72, Divide = 73, SelfPlus = 74, SelfMinus = 75, 
+    Pow = 76, Types = 77, Integer = 78, Float = 79, StringLiteral = 80
   };
 
   explicit RayLexer(antlr4::CharStream *input);

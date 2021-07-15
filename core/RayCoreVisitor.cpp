@@ -1,5 +1,5 @@
 #include "RayCoreVisitor.hpp"
-
+#include "RayCoreErrorHandler-inl.hpp"
 
 antlrcpp::Any RayCoreVisitor::visitStart(RayParser::StartContext *context) {
   if(context->isEmpty()){
@@ -128,8 +128,9 @@ antlrcpp::Any RayCoreVisitor::visitBreakExpression(
         .line = context->start->getLine(),
         .character = context->start->getCharPositionInLine()
     };
-    auto msg = "Unexpected 'break' out of 'for' and 'while' blocks.";
-    std::cerr << "Error in "<< moduleName << ":" << pos.line << "," << pos.character << ": " << msg << std::endl;
+    auto msg = "unexpected 'break' out of 'for' and 'while' blocks.";
+    std::cerr << moduleName << ":" << pos.line << "," << pos.character << ": Error: " << msg << std::endl;
+    RayCoreErrorListener::underLineError(this->tks,context->getStart());
     errors.push_back(this->UNEXPECTED_BREAK);
   }else{
     
@@ -146,8 +147,9 @@ antlrcpp::Any RayCoreVisitor::visitContinueExpression(
         .line = context->start->getLine(),
         .character = context->start->getCharPositionInLine()
     };
-    auto msg = "Unexpected 'continue' out of 'for' and 'while' blocks.";
-    std::cerr << "Error in "<< moduleName << ":" << pos.line << "," << pos.character << ": " << msg << std::endl;
+    auto msg = "unexpected 'continue' out of 'for' and 'while' blocks.";
+    std::cerr << moduleName << ":" << pos.line << "," << pos.character << ": Error:" << msg << std::endl;
+    RayCoreErrorListener::underLineError(this->tks,context->getStart());
     errors.push_back(this->UNEXPECTED_CONTINUE);
   }else{
     

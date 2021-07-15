@@ -60,6 +60,6 @@ void compile(std::ifstream & f, std::string name){
   std::unique_ptr<llvm::Module> module = std::make_unique<llvm::Module>(name , context);
   module->setSourceFileName(name);
   //visit and generate ir code
-  RayCoreVisitor visitor{name,std::move(module)};
+  RayCoreVisitor visitor{name,tks,std::move(module)};
   visitor.visit(parser.start());
 }

@@ -52,6 +52,9 @@ Match: 			 'match';
 For:			 'for';
 While:           'While';
 Return:    		 'return';
+True:            'true';
+False:           'false';
+Null:            'null';
 Identifier: 	 [A-Za-z_$][A-Za-z_0-9$]*;
 
 Plus:       '+';
@@ -222,6 +225,7 @@ expression:
 	  StringLiteral
     | Integer
     | Float
+    | ( True | False | Null )
 	| Identifier('.'Identifier)* '.' functionCall
 	| Identifier('.'Identifier)*
 	| functionCall

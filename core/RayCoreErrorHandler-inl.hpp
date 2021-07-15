@@ -24,7 +24,7 @@ class RayCoreErrorListener : public antlr4::BaseErrorListener{
                                 offendingSymbol->getText().c_str(),
                                 msg.c_str()
                         );
-                underLineError(recognizer, offendingSymbol, line, charPositionInLine);
+                underLineError( tks , offendingSymbol);
             }else{
                 fprintf(stderr,"%s:%lld,%lld: Error: %s \n"  
                                 ,filename.data(),
@@ -37,11 +37,13 @@ class RayCoreErrorListener : public antlr4::BaseErrorListener{
         }
 
     
-    inline void underLineError(
-            Recognizer *recognizer,Token *offendingToken,
-            size_t line,size_t charPositionInLine){
-        const antlr4::CommonTokenStream *tokens= &tks; 
-        const std::string &input= ins.toString();
+    inline static void underLineError(
+            const antlr4::CommonTokenStream &tks,
+            Token *offendingToken
+    ){
+        size_t line{};
+        size_t charPositionInLine{};
+        const std::string &input= tks.getTokenSource()->getInputStream()->toString();
         std::vector<std::string> lines;
         split(input, lines, "\n");
         line = offendingToken->getLine();
@@ -56,7 +58,9 @@ class RayCoreErrorListener : public antlr4::BaseErrorListener{
         if(start >= 0 && stop >= 0 )   for(size_t  i=start;i<=stop;i++) fprintf(stderr,"^");
     }
 
-    inline void split(const std::string& s, std::vector<std::string>& v, const std::string& c)
+   
+
+    inline static void split(const std::string& s, std::vector<std::string>& v, const std::string& c)
     {
         std::string::size_type pos1, pos2;
         pos2 = s.find(c);

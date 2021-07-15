@@ -8,11 +8,16 @@ public:
         size_t character;        
     };
     
-    RayCoreVisitor(std::string moduleName,std::unique_ptr<llvm::Module> module):
+    RayCoreVisitor(
+            std::string moduleName,
+            const antlr4::CommonTokenStream &tks,
+            std::unique_ptr<llvm::Module> module
+        ):
         moduleName(moduleName),
         RayVisitor(),
         forWhileCounts(size_t{}),
-        module(std::move(module))
+        module(std::move(module)),
+        tks(tks)
     {
     }
 
@@ -102,4 +107,5 @@ protected:
     size_t forWhileCounts = 0;
     std::vector<error_code> errors;
     std::unique_ptr<llvm::Module> module;
+    const antlr4::CommonTokenStream &tks;
 };
