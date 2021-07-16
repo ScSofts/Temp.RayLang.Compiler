@@ -6,7 +6,10 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <llvm/IR/AssemblyAnnotationWriter.h>
+#include <llvm/IR/Verifier.h>
 
+bool isModule(const std::string &name);
 void compile(std::ifstream & f, std::string name);
 
 int main(int argc, const char** argv) {
@@ -16,11 +19,17 @@ int main(int argc, const char** argv) {
   }else{
     for(auto i = args.begin() + 1; i < args.end();i++){
       if((*i)[0] != '-'){
+         if(!isModule(*i)){
+           std::cerr << "Unrecognized file format \"" << *i << "\" ! " << std::endl;
+           continue;
+         }
         std::ifstream f(*i,std::ios::binary);
         try{
           compile(f,*i);
         }catch(std::range_error &e){
+      NotModule:
           std::cerr << "Unrecognized file format \"" << *i << "\" ! " << std::endl;
+          continue;
         }catch(std::exception &e){
           std::cerr << "Compiler throwed a exception when handling \"" << *i << "\" : "<< e.what() << std::endl;
         }
@@ -56,10 +65,24 @@ void compile(std::ifstream & f, std::string name){
                 );
     return;
   }
-  llvm::LLVMContext context;
-  std::unique_ptr<llvm::Module> module = std::make_unique<llvm::Module>(name , context);
-  module->setSourceFileName(name);
-  //visit and generate ir code
+  std::unique_ptr<llvm::LLVMContext> context = std::make_unique<llvm::LLVMContext>();
+  std::unique_ptr<llvm::Module> module = std::make_unique<llvm::Module>(name , *context);  
   RayCoreVisitor visitor{name,tks,std::move(module)};
   visitor.visit(parser.start());
+  
+  if(verifyModule(*visitor.getModule()) != false ){
+    llvm::errs() << "Verify Module Error!" << '\n';
+  }
+  llvm::outs() << "IR Generated:" << '\n';
+  llvm::AssemblyAnnotationWriter x{};
+  
+  visitor.getModule()->print(llvm::outs(),&x);
+  std::cout << "=========IR END=========" << std::endl;
+}
+
+bool isModule(const std::string &name){
+  constexpr auto suffixLength =  sizeof(".ray") - 1; // ".ray\0"
+  const auto nameLength  = name.length(); 
+  return nameLength > suffixLength && 
+         name.substr(nameLength - suffixLength) == ".ray";
 }

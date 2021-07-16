@@ -2,7 +2,7 @@
 #include "RayCoreErrorHandler-inl.hpp"
 
 antlrcpp::Any RayCoreVisitor::visitStart(RayParser::StartContext *context) {
-  if(context->isEmpty()){
+  if(context->children.empty()){
     return nullptr;
   }else{
     for (auto i : context->children) {
@@ -27,6 +27,12 @@ antlrcpp::Any RayCoreVisitor::visitDeclaration(
 
 antlrcpp::Any RayCoreVisitor::visitVariableDeclaration(
     RayParser::VariableDeclarationContext *context) {
+    if(isGlobal()){
+       auto type = irBuilder->getDoubleTy();
+       llvm::GlobalVariable* new_gv = llvm::cast<llvm::GlobalVariable> (module->getOrInsertGlobal(makeModuleMemberName("i"), type) );
+       new_gv->setLinkage(llvm::GlobalVariable::PrivateLinkage);
+       new_gv->setInitializer(llvm::ConstantFP::get(type, 12.045f));
+    }
   return antlrcpp::Any{};
 }
 
@@ -85,6 +91,13 @@ antlrcpp::Any RayCoreVisitor::visitArg(RayParser::ArgContext *context) {
 
 antlrcpp::Any RayCoreVisitor::visitTypeStatement(
     RayParser::TypeStatementContext *context) {
+  const auto &identifiers = context->Identifier();
+  if(identifiers.size() == 1){
+    auto name = identifiers[0]->getText();
+  }
+  else{ // == 2
+
+  }
   return antlrcpp::Any{};
 }
 
@@ -130,7 +143,7 @@ antlrcpp::Any RayCoreVisitor::visitBreakExpression(
     };
     auto msg = "unexpected 'break' out of 'for' and 'while' blocks.";
     std::cerr << moduleName << ":" << pos.line << "," << pos.character << ": Error: " << msg << std::endl;
-    RayCoreErrorListener::underLineError(this->tks,context->getStart());
+    RayCoreErrorListener::underLineError(this->tokens,context->getStart());
     errors.push_back(this->UNEXPECTED_BREAK);
   }else{
     
@@ -149,7 +162,7 @@ antlrcpp::Any RayCoreVisitor::visitContinueExpression(
     };
     auto msg = "unexpected 'continue' out of 'for' and 'while' blocks.";
     std::cerr << moduleName << ":" << pos.line << "," << pos.character << ": Error:" << msg << std::endl;
-    RayCoreErrorListener::underLineError(this->tks,context->getStart());
+    RayCoreErrorListener::underLineError(this->tokens,context->getStart());
     errors.push_back(this->UNEXPECTED_CONTINUE);
   }else{
     
