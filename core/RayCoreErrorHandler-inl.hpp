@@ -1,4 +1,6 @@
 #include "antlr4-runtime.h"
+#include <llvm/Support/raw_ostream.h>
+#include <llvm/Support/raw_os_ostream.h>
 
 class RayCoreErrorListener : public antlr4::BaseErrorListener{
     public:
@@ -10,8 +12,11 @@ class RayCoreErrorListener : public antlr4::BaseErrorListener{
 
     virtual void syntaxError(Recognizer *recognizer, Token *offendingSymbol, size_t line,
         size_t charPositionInLine, const std::string &msg,
+        
         std::exception_ptr e)override
         {
+            llvm::errs().enable_colors(true);
+            llvm::errs().changeColor(llvm::errs().RED , false);
             if(offendingSymbol != nullptr)
             {
                         
@@ -24,6 +29,8 @@ class RayCoreErrorListener : public antlr4::BaseErrorListener{
                                 offendingSymbol->getText().c_str(),
                                 msg.c_str()
                         );
+                llvm::errs().changeColor(llvm::errs().WHITE , true);
+            
                 underLineError( tks , offendingSymbol);
             }else{
                 fprintf(stderr,"%s:%lld,%lld: Error: %s \n"  
@@ -33,7 +40,9 @@ class RayCoreErrorListener : public antlr4::BaseErrorListener{
                                 msg.c_str()
                         );
             }
-            errorCount ++;
+            llvm::errs().changeColor(llvm::errs().WHITE , false);
+            
+            errorCount += 1;
         }
 
     
@@ -56,6 +65,7 @@ class RayCoreErrorListener : public antlr4::BaseErrorListener{
         size_t stop = offendingToken->getStopIndex();
         
         if(start >= 0 && stop >= 0 )   for(size_t  i=start;i<=stop;i++) fprintf(stderr,"^");
+        std::cerr << '\n';
     }
 
    

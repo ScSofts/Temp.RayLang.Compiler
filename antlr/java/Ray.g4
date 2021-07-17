@@ -124,7 +124,7 @@ fragment LongLongSuffix
     :   'll' | 'LL'
     ;
 
-Types: (ByteType|IntTypes|FloatTypes|UIntTypes|StringTypes) ('['']')?;
+Types: (ByteType|IntTypes|FloatTypes|UIntTypes|StringTypes) ('['']')*;
 Integer: (BinaryConstant | OctalConstant | DecimalConstant) IntegerSuffix?;
 Float: Digit '.' Digit+;
 fragment DChar

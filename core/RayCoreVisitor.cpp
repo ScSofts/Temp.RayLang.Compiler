@@ -28,10 +28,12 @@ antlrcpp::Any RayCoreVisitor::visitDeclaration(
 antlrcpp::Any RayCoreVisitor::visitVariableDeclaration(
     RayParser::VariableDeclarationContext *context) {
     if(isGlobal()){
-       auto type = irBuilder->getDoubleTy();
-       llvm::GlobalVariable* new_gv = llvm::cast<llvm::GlobalVariable> (module->getOrInsertGlobal(makeModuleMemberName("i"), type) );
-       new_gv->setLinkage(llvm::GlobalVariable::PrivateLinkage);
-       new_gv->setInitializer(llvm::ConstantFP::get(type, 12.045f));
+      //  auto type = irBuilder->getDoubleTy();
+      //  llvm::GlobalVariable* new_gv = llvm::cast<llvm::GlobalVariable> (module->getOrInsertGlobal(makeModuleMemberName("i"), type) );
+      //  new_gv->setLinkage(llvm::GlobalVariable::PrivateLinkage);
+      //  new_gv->setInitializer(llvm::ConstantFP::get(type, 12.045f));
+    }else{
+      
     }
   return antlrcpp::Any{};
 }
@@ -92,8 +94,13 @@ antlrcpp::Any RayCoreVisitor::visitArg(RayParser::ArgContext *context) {
 antlrcpp::Any RayCoreVisitor::visitTypeStatement(
     RayParser::TypeStatementContext *context) {
   const auto &identifiers = context->Identifier();
-  if(identifiers.size() == 1){
-    auto name = identifiers[0]->getText();
+  if(identifiers.size() == 1 && context->Types() != nullptr){
+    auto key = identifiers[0]->getText();
+    if(!isDefined(key)){
+      auto type = Ray::getBasicType(context->Types()->getText(), irBuilder);
+    }else{
+
+    }
   }
   else{ // == 2
 
@@ -142,9 +149,9 @@ antlrcpp::Any RayCoreVisitor::visitBreakExpression(
         .character = context->start->getCharPositionInLine()
     };
     auto msg = "unexpected 'break' out of 'for' and 'while' blocks.";
-    std::cerr << moduleName << ":" << pos.line << "," << pos.character << ": Error: " << msg << std::endl;
+    parserError(pos, msg, this->UNEXPECTED_BREAK);
     RayCoreErrorListener::underLineError(this->tokens,context->getStart());
-    errors.push_back(this->UNEXPECTED_BREAK);
+    return nullptr;
   }else{
     
   }
@@ -161,9 +168,9 @@ antlrcpp::Any RayCoreVisitor::visitContinueExpression(
         .character = context->start->getCharPositionInLine()
     };
     auto msg = "unexpected 'continue' out of 'for' and 'while' blocks.";
-    std::cerr << moduleName << ":" << pos.line << "," << pos.character << ": Error:" << msg << std::endl;
+    parserError(pos, msg, this->UNEXPECTED_CONTINUE);
     RayCoreErrorListener::underLineError(this->tokens,context->getStart());
-    errors.push_back(this->UNEXPECTED_CONTINUE);
+    return nullptr;
   }else{
     
   }

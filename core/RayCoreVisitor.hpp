@@ -1,5 +1,5 @@
 #include "RayVisitor.h"
-#include <llvm/IR/IRBuilder.h>
+#include "../utils/gettype-inl.h"
 #include <unordered_map>
 
 class RayCoreVisitor : public RayVisitor{
@@ -8,6 +8,17 @@ public:
         size_t line;
         size_t character;        
     };
+    
+    using error_code = enum{
+        UNEXPECTED_BREAK,
+        UNEXPECTED_CONTINUE,
+        REDEFINE_VARIABLE,
+        REDEFINE_FUNCTION,
+    };
+   
+
+    using Type = Ray::Type;
+    using Variable = Ray::Variable;
     
     RayCoreVisitor(
             std::string moduleName,
@@ -32,6 +43,15 @@ public:
     std::unique_ptr<llvm::Module> &getModule(){
         return this->module;
     }
+
+    bool success(){
+        return errors.empty();
+    }
+
+    std::vector<error_code> &getErrors(){
+        return errors;
+    }
+
   /**
    * Visit parse trees produced by RayParser.
    */
@@ -148,22 +168,30 @@ protected:
     }
 
     inline bool isDefined(std::string id){
-        return (variablesPrivate.count(id)       == 0) && 
-               (variablesPublic.count(id)        == 0) &&
-               (functionPrivate.count(id)        == 0) &&
-               (functionPublic.count(id)         == 0) &&
-               
-               (typeMapPublic.count(id)          == 0) &&
-               (typeMapsPrivate.count(id)        == 0) &&
-               (nativeVariablesPublic.count(id)  == 0) &&
-               (nativeVariablesPrivate.count(id) == 0);
+        return (variablesPrivate.count(id)        == 0) && 
+               (variablesPublic.count(id)         == 0) &&
+               (variablesImported.count(id)       == 0) &&
+
+               (functionPrivate.count(id)         == 0) &&
+               (functionPublic.count(id)          == 0) &&
+               (functionImported.count(id)        == 0) &&
+
+               (typeMapPublic.count(id)           == 0) &&
+               (typeMapPrivate.count(id)          == 0) &&
+               (typeMapImported.count(id)         == 0) &&
+
+               (nativeVariablesPublic.count(id)   == 0) &&
+               (nativeVariablesPrivate.count(id)  == 0) &&
+               (nativeVariablesImported.count(id) == 0);
+    }
+
+    inline void parserError(position_t pos,const llvm::StringRef msg,error_code err){
+        llvm::errs() << moduleName << ":" << pos.line << "," << pos.character << ": Error: " << msg.str() << '\n';
+        errors.push_back(err);
     }
 
 protected:
-    using error_code = enum{
-        UNEXPECTED_BREAK,
-        UNEXPECTED_CONTINUE,
-    };
+
 
     std::string moduleName;
     size_t forWhileCounts = 0;
@@ -173,21 +201,21 @@ protected:
     llvm::LLVMContext * context;
     const antlr4::CommonTokenStream &tokens;
 
-    struct Variable{
-        llvm::Type *type;
-        llvm::Value *value;
-    };
-
-
 
     std::unordered_map<std::string, Variable> variablesPrivate;
     std::unordered_map<std::string, Variable> variablesPublic;
     std::unordered_map<std::string, Variable> nativeVariablesPrivate;
     std::unordered_map<std::string, Variable> nativeVariablesPublic;
     
-    std::unordered_map<std::string, llvm::Type*>        typeMapsPrivate;
-    std::unordered_map<std::string, llvm::Type*>        typeMapPublic;
+    std::unordered_map<std::string, Type>        typeMapPrivate;
+    std::unordered_map<std::string, Type>        typeMapPublic;
     std::unordered_map<std::string, llvm::Function*>    functionPrivate;
     std::unordered_map<std::string, llvm::Function*>    functionPublic;
+
+
+    std::unordered_map<std::string, Variable> variablesImported;
+    std::unordered_map<std::string, Variable> nativeVariablesImported;
+    std::unordered_map<std::string, Type> typeMapImported;
+    std::unordered_map<std::string, llvm::Function *> functionImported;
     size_t isFunction;
 };

@@ -13,6 +13,10 @@ bool isModule(const std::string &name);
 void compile(std::ifstream & f, std::string name);
 
 int main(int argc, const char** argv) {
+  
+  llvm::outs().enable_colors(true);
+  llvm::outs().changeColor(llvm::outs().WHITE);
+
   std::vector<std::string> args( argv , argv + argc);
   if(args.size() == 1){
     help(args[0]);
@@ -36,6 +40,9 @@ int main(int argc, const char** argv) {
       }
     }
   }
+
+  llvm::outs().changeColor(llvm::outs().WHITE);
+  llvm::outs().enable_colors(false);
   return 0;
 }
 
@@ -57,27 +64,41 @@ void compile(std::ifstream & f, std::string name){
   parser.removeErrorListeners();
   parser.addErrorListener(&errorListener);
   
-  if(errorListener.errorCount > 0){
-    std::fprintf(stderr,
-                  "Compile \"%s\" failed with %lld error(s).",
-                  name.c_str(),
-                  errorListener.errorCount
-                );
-    return;
-  }
+
   std::unique_ptr<llvm::LLVMContext> context = std::make_unique<llvm::LLVMContext>();
   std::unique_ptr<llvm::Module> module = std::make_unique<llvm::Module>(name , *context);  
   RayCoreVisitor visitor{name,tks,std::move(module)};
   visitor.visit(parser.start());
-  
+
+  if(errorListener.errorCount > 0){
+    llvm::errs().enable_colors(true);
+    llvm::errs().changeColor(llvm::errs().WHITE, false);
+    std::fprintf(stderr,
+                  "Compile module \"%s\" failed with %lld error(s).",
+                  name.c_str(),
+                  errorListener.errorCount
+                );
+    llvm::errs().changeColor(llvm::errs().WHITE, false);
+    return;
+  }
+
+  if(!visitor.success()){
+    llvm::errs().enable_colors(true);
+    llvm::errs().changeColor(llvm::errs().WHITE,true);
+    llvm::errs() << "Compile module \"" << name << "\" failed with " << visitor.getErrors().size() << " error(s)." << '\n';
+    llvm::errs().changeColor(llvm::errs().WHITE, false);
+    return;
+  }
   if(verifyModule(*visitor.getModule()) != false ){
     llvm::errs() << "Verify Module Error!" << '\n';
   }
   llvm::outs() << "IR Generated:" << '\n';
   llvm::AssemblyAnnotationWriter x{};
-  
+  llvm::outs().enable_colors(true);
+  llvm::outs().changeColor(llvm::outs().WHITE, true ,false);
   visitor.getModule()->print(llvm::outs(),&x);
-  std::cout << "=========IR END=========" << std::endl;
+  llvm::outs().changeColor(llvm::outs().WHITE, false );
+  llvm::outs() << "=========IR END=========" << '\n';
 }
 
 bool isModule(const std::string &name){
