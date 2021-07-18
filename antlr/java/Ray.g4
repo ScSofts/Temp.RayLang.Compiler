@@ -152,10 +152,10 @@ start: (declaration | statement | expression)*? EOF;
 
 declaration: variableDeclaration| nativedVar | functionDeclaration | getDeclaration | putDeclaration;
 
-variableDeclaration: exportStatement?  (Var|Const) Identifier ':' (Types|Identifier) ('=' expression)? ';';
-nativedVar: nativedDeclaration (Var|Const) Identifier ':' (Types|Identifier) ';' ;
+variableDeclaration: exportStatement?  (Var|Const) Identifier ':' typeAppendix  ('=' expression)? ';';
+nativedVar: nativedDeclaration (Var|Const) Identifier ':' typeAppendix ';' ;
 
-functionDeclaration: (functionSuffix| nativedDeclaration )? ('fn'|'function') Identifier '(' ( arg (',' arg)*)? ')' (':' (Types|Identifier) )? ';';
+functionDeclaration: (functionSuffix| nativedDeclaration )? ('fn'|'function') Identifier '(' ( arg (',' arg)*)? ')' (':' typeAppendix )? ';';
 nativedDeclaration:('@' 'native' '(' StringLiteral ',' StringLiteral ')');
 
 getDeclaration: At'get' Identifier('.'Identifier)* 'as' ( getBlock | Identifier ) ';' ;
@@ -166,10 +166,10 @@ putDeclaration: At'put' putBlock ';'?;
 putBlock: '{' (variableDeclaration | functionDeclaration | statement)* '}';
 
 statement: functionStatement | typeStatement;
-functionStatement: functionSuffix? ('fn'|'function') Identifier '(' ( arg (',' arg)*)? ')' (':' (Types|Identifier) )? functionBlock;
-arg: Identifier ':' (Types|Identifier);
+functionStatement: functionSuffix? ('fn'|'function') Identifier '(' ( arg (',' arg)*)? ')' (':' typeAppendix  )? functionBlock;
+arg: Identifier ':' typeAppendix;
 
-typeStatement: 'type' Identifier '='  (Types | Identifier) ';';
+typeStatement: 'type' Identifier '='  typeAppendix ';';
 
 
 functionSuffix: exportStatement
@@ -225,12 +225,14 @@ expression:
 	  StringLiteral
     | Integer
     | Float
+    | Identifier
     | ( True | False | Null )
-	| Identifier('['expression']')* ('.'Identifier('['expression']')*)* '.' functionCall
-	| Identifier('['expression']')* ('.'Identifier('['expression']')*)*
-	| functionCall
     | '(' expression ')'
-	| expression ('++'|'--')
+	| functionCall
+    | expression '[' expression ']'
+    | expression '.' functionCall
+    | expression ('.'Identifier)+ 
+    | expression ('++'|'--')
 	| ('++'|'--')expression
     | expression ('<<'|'>>') expression
 	| expression ('>'|'<'|'>='|'<='|'=='|'!=') expression
@@ -246,7 +248,15 @@ expression:
 	| <assoc=right> ('!'|'~')  expression
 	| <assoc=right>Identifier ('='|'+='|'-='|'*='|'/='|'^='|'|='|'&='|'<<='|'=>>') expression
     |'[' (expression (','expression)*)? ']'
+
 	;
 
 functionCall:
 	Identifier '(' (expression ( ',' expression)*? )? ')';
+
+typeAppendix:
+      Types
+    | Identifier
+    | Types ('[' ']')+
+    | Identifier ('[' ']')+
+    ;

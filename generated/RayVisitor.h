@@ -75,6 +75,8 @@ public:
 
     virtual antlrcpp::Any visitFunctionCall(RayParser::FunctionCallContext *context) = 0;
 
+    virtual antlrcpp::Any visitTypeAppendix(RayParser::TypeAppendixContext *context) = 0;
+
 
 };
 

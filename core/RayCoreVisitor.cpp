@@ -2,12 +2,9 @@
 #include "RayCoreErrorHandler-inl.hpp"
 
 antlrcpp::Any RayCoreVisitor::visitStart(RayParser::StartContext *context) {
-  if(context->children.empty()){
-    return nullptr;
-  }else{
-    for (auto i : context->children) {
+  if(!context->children.empty()){
+    for(auto &i : context->children)
       visit(i);
-    }
   }
   if(errors.empty())
     return true;
@@ -79,6 +76,8 @@ antlrcpp::Any RayCoreVisitor::visitPutBlock(
 
 antlrcpp::Any RayCoreVisitor::visitStatement(
     RayParser::StatementContext *context) {
+      for(auto &i : context->children)
+        visit(i);
   return antlrcpp::Any{};
 }
 
@@ -93,18 +92,27 @@ antlrcpp::Any RayCoreVisitor::visitArg(RayParser::ArgContext *context) {
 
 antlrcpp::Any RayCoreVisitor::visitTypeStatement(
     RayParser::TypeStatementContext *context) {
-  const auto &identifiers = context->Identifier();
-  if(identifiers.size() == 1 && context->Types() != nullptr){
-    auto key = identifiers[0]->getText();
-    if(!isDefined(key)){
-      auto type = Ray::getBasicType(context->Types()->getText(), irBuilder);
+    auto identifier = context->Identifier();
+    std::string name = identifier->getText();
+    if(!isDefined(name)){
+        Ray::Type type =  visit(context->typeAppendix());
+        return typeMap_t{name,type};
     }else{
-
+        std::string msg = "redefinition of identifier";
+        msg += '\'';
+        msg += name;
+        msg += '\'';
+        msg += '.';
+        position_t pos = {
+            identifier->getSymbol()->getLine(),
+            identifier->getSymbol()->getCharPositionInLine()
+            };
+        parserError(pos, msg, this->REDEFINE_TYPE);
+        RayCoreErrorListener::underLineError(this->tokens,identifier->getSymbol());
+        return antlrcpp::Any{nullptr};
     }
-  }
-  else{ // == 2
+  
 
-  }
   return antlrcpp::Any{};
 }
 
@@ -201,5 +209,9 @@ antlrcpp::Any RayCoreVisitor::visitExpression(
 
 antlrcpp::Any RayCoreVisitor::visitFunctionCall(
     RayParser::FunctionCallContext *context) {
+  return antlrcpp::Any{};
+}
+
+antlrcpp::Any RayCoreVisitor::visitTypeAppendix(RayParser::TypeAppendixContext *context){
   return antlrcpp::Any{};
 }

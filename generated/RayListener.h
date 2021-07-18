@@ -98,6 +98,9 @@ public:
   virtual void enterFunctionCall(RayParser::FunctionCallContext *ctx) = 0;
   virtual void exitFunctionCall(RayParser::FunctionCallContext *ctx) = 0;
 
+  virtual void enterTypeAppendix(RayParser::TypeAppendixContext *ctx) = 0;
+  virtual void exitTypeAppendix(RayParser::TypeAppendixContext *ctx) = 0;
+
 
 };
 

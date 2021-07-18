@@ -127,6 +127,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitTypeAppendix(RayParser::TypeAppendixContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
 
 };
 

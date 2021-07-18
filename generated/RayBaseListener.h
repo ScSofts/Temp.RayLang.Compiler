@@ -100,6 +100,9 @@ public:
   virtual void enterFunctionCall(RayParser::FunctionCallContext * /*ctx*/) override { }
   virtual void exitFunctionCall(RayParser::FunctionCallContext * /*ctx*/) override { }
 
+  virtual void enterTypeAppendix(RayParser::TypeAppendixContext * /*ctx*/) override { }
+  virtual void exitTypeAppendix(RayParser::TypeAppendixContext * /*ctx*/) override { }
+
 
   virtual void enterEveryRule(antlr4::ParserRuleContext * /*ctx*/) override { }
   virtual void exitEveryRule(antlr4::ParserRuleContext * /*ctx*/) override { }

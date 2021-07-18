@@ -8,12 +8,18 @@ public:
         size_t line;
         size_t character;        
     };
+
+    struct typeMap_t{
+        std::string name;
+        Ray::Type type;
+    };
     
     using error_code = enum{
         UNEXPECTED_BREAK,
         UNEXPECTED_CONTINUE,
         REDEFINE_VARIABLE,
         REDEFINE_FUNCTION,
+        REDEFINE_TYPE
     };
    
 
@@ -111,6 +117,7 @@ public:
 
     virtual antlrcpp::Any visitFunctionCall(RayParser::FunctionCallContext *context)override;
 
+    virtual antlrcpp::Any visitTypeAppendix(RayParser::TypeAppendixContext *context)override;
 
 protected: 
    void enterForWhileBlock(){
@@ -168,26 +175,28 @@ protected:
     }
 
     inline bool isDefined(std::string id){
-        return (variablesPrivate.count(id)        == 0) && 
-               (variablesPublic.count(id)         == 0) &&
-               (variablesImported.count(id)       == 0) &&
+        return (variablesPrivate.count(id)        != 0) || 
+               (variablesPublic.count(id)         != 0) ||
+               (variablesImported.count(id)       != 0) ||
 
-               (functionPrivate.count(id)         == 0) &&
-               (functionPublic.count(id)          == 0) &&
-               (functionImported.count(id)        == 0) &&
+               (functionPrivate.count(id)         != 0) ||
+               (functionPublic.count(id)          != 0) ||
+               (functionImported.count(id)        != 0) ||
 
-               (typeMapPublic.count(id)           == 0) &&
-               (typeMapPrivate.count(id)          == 0) &&
-               (typeMapImported.count(id)         == 0) &&
+               (typeMapPublic.count(id)           != 0) ||
+               (typeMapPrivate.count(id)          != 0) ||
+               (typeMapImported.count(id)         != 0) ||
 
-               (nativeVariablesPublic.count(id)   == 0) &&
-               (nativeVariablesPrivate.count(id)  == 0) &&
-               (nativeVariablesImported.count(id) == 0);
+               (nativeVariablesPublic.count(id)   != 0) ||
+               (nativeVariablesPrivate.count(id)  != 0) ||
+               (nativeVariablesImported.count(id) != 0);
     }
 
     inline void parserError(position_t pos,const llvm::StringRef msg,error_code err){
+        llvm::errs().changeColor(llvm::errs().RED);
         llvm::errs() << moduleName << ":" << pos.line << "," << pos.character << ": Error: " << msg.str() << '\n';
         errors.push_back(err);
+        llvm::errs().changeColor(llvm::errs().WHITE);
     }
 
 protected:
@@ -202,15 +211,15 @@ protected:
     const antlr4::CommonTokenStream &tokens;
 
 
-    std::unordered_map<std::string, Variable> variablesPrivate;
-    std::unordered_map<std::string, Variable> variablesPublic;
-    std::unordered_map<std::string, Variable> nativeVariablesPrivate;
-    std::unordered_map<std::string, Variable> nativeVariablesPublic;
+    std::unordered_map<std::string, Variable> variablesPrivate{};
+    std::unordered_map<std::string, Variable> variablesPublic{};
+    std::unordered_map<std::string, Variable> nativeVariablesPrivate{};
+    std::unordered_map<std::string, Variable> nativeVariablesPublic{};
     
-    std::unordered_map<std::string, Type>        typeMapPrivate;
-    std::unordered_map<std::string, Type>        typeMapPublic;
-    std::unordered_map<std::string, llvm::Function*>    functionPrivate;
-    std::unordered_map<std::string, llvm::Function*>    functionPublic;
+    std::unordered_map<std::string, Type>        typeMapPrivate{};
+    std::unordered_map<std::string, Type>        typeMapPublic{};
+    std::unordered_map<std::string, llvm::Function*>    functionPrivate{};
+    std::unordered_map<std::string, llvm::Function*>    functionPublic{};
 
 
     std::unordered_map<std::string, Variable> variablesImported;
