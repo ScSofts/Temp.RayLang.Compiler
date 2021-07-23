@@ -8,9 +8,10 @@
             "type": "lldb",
             "request": "launch",
             "name": "Debug",
-            "program": "${workspaceFolder}/<your program>",
-            "args": [],
-            "cwd": "${workspaceFolder}"
+            "program": "${workspaceFolder}/build/rayc.exe",
+            "args": ["test.ray"],
+            "cwd": "${workspaceFolder}/build/",
+           "preLaunchTask": "Build"
         }
     ]
 }

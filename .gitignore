@@ -327,3 +327,4 @@ dist/
 .cache/clangd/index/XPathWildcardElement.h.6BB47AD3A3CCAB7D.idx
 .cache/clangd/index/rayc.cc.7A26A241861941F0.idx
 .cache/clangd/index/rayc.cc.7A26A241861941F0.idx
+rebuild.bat

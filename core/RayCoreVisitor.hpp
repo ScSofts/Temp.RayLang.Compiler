@@ -1,3 +1,4 @@
+#include "../utils/llvm-all.h"
 #include "RayVisitor.h"
 #include "../utils/gettype-inl.h"
 #include <unordered_map>
@@ -17,9 +18,11 @@ public:
     using error_code = enum{
         UNEXPECTED_BREAK,
         UNEXPECTED_CONTINUE,
+        UNEXPECTED_BLOCK,
         REDEFINE_VARIABLE,
         REDEFINE_FUNCTION,
-        REDEFINE_TYPE
+        REDEFINE_TYPE,
+        INVALID_TYPE,
     };
    
 
@@ -36,7 +39,8 @@ public:
         forWhileCounts(size_t{}),
         module(std::move(module)),
         tokens(tokens),
-        isFunction(size_t{})
+        isFunction(size_t{}),
+        funcBlock(nullptr)
     {
         this->irBuilder = std::make_unique<llvm::IRBuilder<>>(this->module->getContext());
         context = & this->module->getContext();
@@ -144,6 +148,9 @@ protected:
        return forWhileCounts == 0;
    }
 
+   void invaildTypeError(antlr4::Token      *token);
+   void redefinitionError(antlr4::Token     *token);
+   void unexpectedBlockError(antlr4::Token  *token);
 protected:
 
     std::string makeModuleMemberName(llvm::StringRef name)const{
@@ -227,4 +234,7 @@ protected:
     std::unordered_map<std::string, Type> typeMapImported;
     std::unordered_map<std::string, llvm::Function *> functionImported;
     size_t isFunction;
+
+
+    llvm::BasicBlock *funcBlock;
 };

@@ -1,6 +1,5 @@
-#include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/Function.h>
-#include <llvm/IR/Module.h>
+#pragma once
+#include "./llvm-all.h"
 
 namespace Ray{
     struct Type{
@@ -57,7 +56,10 @@ namespace Ray{
         }else if (name == "uint64") {
             _type.type = irBuilder->getInt64Ty();
             _type.isSigned = false;
+        }else if(name == "void"){
+            return irBuilder->getVoidTy();
         }
+        
 
         return _type;
     }
